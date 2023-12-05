@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import cog1store from "./modules/cog1store.js";
 
 export default createStore({
   state: {
@@ -37,5 +38,7 @@ export default createStore({
       }
     },
   },
-  modules: {},
+  modules: {
+    cog1store,
+  },
 });

@@ -4928,3 +4928,6 @@ table tr {
     .tableScroll th:first-child {
         z-index: 10;
     }
+.ml3{
+    margin-left: 3px;
+}
