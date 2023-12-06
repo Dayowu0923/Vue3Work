@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
-import Cog_1View from "../views/Cog1View.vue";
-
+import Cog1View from "../views/Cog1View.vue";
+import store from "../store";
 const routes = [
   {
     path: "/login",
@@ -11,7 +11,7 @@ const routes = [
   {
     path: "/cog1",
     name: "cog1",
-    component: Cog_1View,
+    component: Cog1View,
     meta: { requiresAuth: true },
   },
   {
@@ -29,9 +29,11 @@ router.beforeEach((to, from, next) => {
     if (!chk_login()) {
       next({ name: "login" });
     } else {
+      store.commit("SetRouteName", to.name);
       next();
     }
   } else {
+    store.commit("SetRouteName", to.name);
     next();
   }
 });

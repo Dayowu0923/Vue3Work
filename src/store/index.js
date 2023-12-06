@@ -8,8 +8,25 @@ export default createStore({
     token: "",
     mainPer: [],
     subPer: [],
+    routename: "",
   },
-  getters: {},
+  getters: {
+    MainTitle: (state) => {
+      if (state.subPer.length > 0) {
+        let main = state.subPer.find(
+          (item) => item.menuPath === state.routename
+        );
+        let re = state.mainPer.find((item) => item.menuId === main.menuLastId);
+        return re.menu;
+      } else return "";
+    },
+    SubTitle: (state) => {
+      if (state.subPer.length > 0) {
+        let re = state.subPer.find((item) => item.menuPath === state.routename);
+        return re.menu;
+      } else return "";
+    },
+  },
   mutations: {
     UserChk(state, payload) {
       state.mainPer = payload.mainPer;
@@ -28,6 +45,9 @@ export default createStore({
       localStorage.setItem("mainPer", "");
       localStorage.setItem("subPer", "");
       localStorage.setItem("userPermissions", "");
+    },
+    SetRouteName(state, name) {
+      state.routename = name;
     },
   },
   actions: {
