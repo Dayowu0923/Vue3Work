@@ -71,8 +71,8 @@
                     <th>功能</th>
                   </tr>
                 </thead>
-                <tr v-for="(item, index) in filterTable" :key="index">
-                  <td>{{ index + 1 }}</td>
+                <tr v-for="(item, index) in PageViewer" :key="index">
+                  <td>{{ index + 1 + (page - 1) * 10 }}</td>
                   <td>{{ item.no }}</td>
                   <td>{{ item.name }}</td>
                   <td>{{ item.uuser }}</td>
@@ -93,6 +93,27 @@
                   </td>
                 </tr>
               </table>
+              <div class="pager">
+                <PaginateMo
+                  v-model="page"
+                  :page-count="pageCount"
+                  :page-range="10"
+                  :margin-pages="0"
+                  :prev-text="'<'"
+                  :next-text="'>'"
+                  :container-class="''"
+                  :active-class="'active'"
+                  :page-class="''"
+                  :page-link-class="'normal'"
+                  :prev-class="''"
+                  :prev-link-class="''"
+                  :next-class="''"
+                  :next-link-class="''"
+                  :break-view-class="'dsn'"
+                  :break-view-link-class="'dsn'"
+                >
+                </PaginateMo>
+              </div>
             </div>
           </div>
         </div>
@@ -110,10 +131,20 @@ export default {
       search_no: "",
       name: "",
       no: "",
+      page: 1,
+      totalcount: 0,
     };
   },
   created() {
     this.fetchData();
+  },
+  watch: {
+    changedata(value) {
+      if (value === 1) {
+        this.fetchData();
+        this.$store.commit("cog1store/changeData", 0);
+      }
+    },
   },
   methods: {
     fetchData() {
@@ -126,17 +157,10 @@ export default {
         })
         .catch((error) => {
           if (error.response.status === 401) {
-            this.$swal
-              .fire({
-                text: "請重新登入",
-                icon: "info",
-                confirmButtonText: "確定",
-                confirmButtonColor: "#3085d6",
-              })
-              .then(() => {
-                this.$store.commit("UserChkNone");
-                this.$router.push({ name: "login" });
-              });
+            this.$showAlertThen("請重新登入", "info", () => {
+              this.$store.commit("UserChkNone");
+              this.$router.push({ name: "login" });
+            });
           } else {
             console.log(error);
             // 處理錯誤
@@ -153,7 +177,30 @@ export default {
     },
     del(e) {
       let id = e.currentTarget.id.replace("del", "");
-      console.log(id);
+      this.$showConfirmationDialog("您確定是否刪除").then((result) => {
+        if (result.isConfirmed) {
+          this.axios
+            .delete(this.$apiBaseUrl + "Cog1/" + id, {
+              headers: { Authorization: `Bearer ${this.$store.state.token}` },
+            })
+            .then(() => {
+              this.$showAlertThen("操作成功", "success", () => {
+                this.fetchData();
+              });
+            })
+            .catch((error) => {
+              if (error.response.status === 401) {
+                this.$showAlertThen("請重新登入", "info", () => {
+                  this.$store.commit("UserChkNone");
+                  this.$router.push({ name: "login" });
+                });
+              } else {
+                console.log(error);
+                // 處理錯誤
+              }
+            });
+        }
+      });
     },
     add() {
       this.$store.commit("cog1store/addData", -1);
@@ -162,12 +209,14 @@ export default {
       });
     },
     clearsearch() {
+      this.page = 1;
       this.search_no = "";
       this.search_name = "";
       this.no = "";
       this.name = "";
     },
     search() {
+      this.page = 1;
       this.search_no = this.no;
       this.search_name = this.name;
     },
@@ -183,8 +232,21 @@ export default {
       }
       return arr;
     },
+    PageViewer() {
+      let arr = this.filterTable;
+      let page = (this.page - 1) * 10;
+      let pageN = this.page * 10;
+      arr = arr.slice(page, pageN);
+      return arr;
+    },
     rows() {
       return this.filterTable.length;
+    },
+    changedata() {
+      return this.$store.state.cog1store.change;
+    },
+    pageCount() {
+      return Math.ceil(this.rows / this.$store.state.pagecount);
     },
   },
 };

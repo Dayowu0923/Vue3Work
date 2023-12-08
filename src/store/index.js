@@ -3,7 +3,7 @@ import cog1store from "./modules/cog1store.js";
 
 export default createStore({
   state: {
-    counter: 0,
+    pagecount: 10,
     loginchk: 0,
     token: "",
     mainPer: [],
@@ -12,7 +12,7 @@ export default createStore({
   },
   getters: {
     MainTitle: (state) => {
-      if (state.subPer.length > 0) {
+      if (state.subPer.length > 0 && state.routename != "login") {
         let main = state.subPer.find(
           (item) => item.menuPath === state.routename
         );
@@ -21,7 +21,7 @@ export default createStore({
       } else return "";
     },
     SubTitle: (state) => {
-      if (state.subPer.length > 0) {
+      if (state.subPer.length > 0 && state.routename != "login") {
         let re = state.subPer.find((item) => item.menuPath === state.routename);
         return re.menu;
       } else return "";

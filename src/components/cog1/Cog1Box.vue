@@ -80,44 +80,33 @@ export default {
         name: this.txt_name,
         id: this.$store.state.cog1store.edit_id,
       };
+      // 構建請求配置
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.state.token}`,
+        },
+      };
+      const isEdit = this.$store.state.cog1store.edit_id !== 0;
       const uri =
-        this.$store.state.cog1store.edit_id == 0
-          ? this.$apiBaseUrl + "Post/Cog1"
-          : this.$apiBaseUrl +
-            "Put/Cog1/" +
-            this.$store.state.cog1store.edit_id;
-      this.axios
-        .post(uri, Postdata)
-        .then((response) => {
-          this.$store.commit("UserChk", response.data);
-          this.$swal
-            .fire({
-              text: "登入成功",
-              icon: "success",
-              confirmButtonText: "確定",
-              confirmButtonColor: "#3085d6",
-            })
-            .then(() => {
-              this.$router.push({ name: "cog1" });
-            });
+        this.$apiBaseUrl +
+        (isEdit ? `Cog1/${this.$store.state.cog1store.edit_id}` : "Cog1");
+      // 根據是創建還是更新來選擇 HTTP 方法
+      const requestMethod = isEdit ? this.axios.put : this.axios.post;
+
+      requestMethod(uri, Postdata, config)
+        .then(() => {
+          this.$showAlertThen("操作成功", "success", () => {
+            this.$store.commit("cog1store/changeData", 1);
+            $("#addnew").modal("hide");
+          });
         })
         .catch((error) => {
-          this.$store.commit("UserChkNone");
-          if (error.response.status === 400 || error.response.status === 401) {
-            this.$swal.fire({
-              text: error.response.data,
-              icon: "error",
-              confirmButtonText: "確定",
-              confirmButtonColor: "#3085d6",
+          if (error.response.status === 401) {
+            this.$showAlertThen("請重新登入", "info", () => {
+              this.$store.commit("UserChkNone");
+              this.$router.push({ name: "login" });
             });
-          } else {
-            console.log(error);
-            // 處理錯誤
           }
-          this.refreshCaptcha();
-          this.captchatxt = "";
-          this.account = "";
-          this.password = "";
         });
     },
   },

@@ -114,22 +114,12 @@ export default {
   },
   methods: {
     logout() {
-      this.$swal
-        .fire({
-          text: "您確定是否登出嗎",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "確定",
-          cancelButtonText: "取消",
-        })
-        .then((result) => {
-          if (result.isConfirmed) {
-            this.$store.commit("UserChkNone");
-            this.$router.push({ name: "login" });
-          }
-        });
+      this.$showConfirmationDialog("您確定是否登出嗎").then((result) => {
+        if (result.isConfirmed) {
+          this.$store.commit("UserChkNone");
+          this.$router.push({ name: "login" });
+        }
+      });
     },
   },
   computed: {
