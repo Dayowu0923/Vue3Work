@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
 import Cog1View from "../views/Cog1View.vue";
+import CogItem from "../views/CogItem.vue";
 import store from "../store";
 const routes = [
   {
@@ -12,6 +13,12 @@ const routes = [
     path: "/cog1",
     name: "cog1",
     component: Cog1View,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/cogitem",
+    name: "cogitem",
+    component: CogItem,
     meta: { requiresAuth: true },
   },
   {

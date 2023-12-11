@@ -19,12 +19,27 @@
         <div class="card">
           <div class="card-body">
             <div class="form-row">
-              <div class="form-group col-lg-3">
-                <label>類別代碼：</label>
+              <div class="form-group col-lg-4">
+                <label>代碼類別：</label>
+                <v-select
+                  :options="MainDrop"
+                  placeholder="請選擇"
+                  label="name"
+                  v-model="type"
+                  :clearable="false"
+                  :reduce="(option) => option.id"
+                >
+                  <template #no-options>没有選項</template>
+                  <template #no-results>没有找到此關鍵字選項</template>
+                </v-select>
+              </div>
+
+              <div class="form-group col-lg-4">
+                <label>基本代碼：</label>
                 <input type="text" v-model="no" class="form-control" />
               </div>
-              <div class="form-group col-lg-3">
-                <label>類別名稱：</label>
+              <div class="form-group col-lg-4">
+                <label>基本代碼名稱：</label>
                 <input type="text" v-model="name" class="form-control" />
               </div>
             </div>
@@ -64,8 +79,9 @@
                 <thead>
                   <tr>
                     <th>NO.</th>
-                    <th>類別代碼</th>
-                    <th>類別名稱</th>
+                    <th>代碼</th>
+                    <th>代碼類別</th>
+                    <th>代碼名稱</th>
                     <th>更新人員</th>
                     <th>更新時間</th>
                     <th>功能</th>
@@ -73,6 +89,7 @@
                 </thead>
                 <tr v-for="(item, index) in PageViewer" :key="index">
                   <td>{{ index + 1 + (page - 1) * 10 }}</td>
+                  <td>{{ item.mname }}</td>
                   <td>{{ item.no }}</td>
                   <td>{{ item.name }}</td>
                   <td>{{ item.uuser }}</td>
@@ -149,36 +166,61 @@
 
 <script>
 export default {
-  name: "Cog1Table",
+  name: "CogItemTable",
   data() {
     return {
       search_name: "",
       search_no: "",
       name: "",
       no: "",
+      search_type: "",
+      type: "",
       page: 1,
       totalcount: 0,
     };
   },
   created() {
     this.fetchData();
+    this.fetchDdl();
   },
   watch: {
     changedata(value) {
       if (value === 1) {
         this.fetchData();
-        this.$store.commit("cog1store/changeData", 0);
+        this.$store.commit("cogitemstore/changeData", 0);
       }
     },
   },
   methods: {
-    fetchData() {
+    fetchDdl() {
       this.axios
         .get(this.$apiBaseUrl + "Cog1", {
           headers: { Authorization: `Bearer ${this.$store.state.token}` },
         })
         .then((response) => {
-          this.$store.commit("cog1store/fetchData", response.data);
+          this.$store.commit("cogitemstore/fetchDdl", response.data);
+        })
+        .catch((error) => {
+          if (error.response) {
+            if (error.response.status === 401) {
+              this.$showAlertThen("請重新登入", "info", () => {
+                this.$store.commit("UserChkNone");
+                this.$router.push({ name: "login" });
+              });
+            } else {
+              console.log(error);
+              // 處理錯誤
+            }
+          }
+        });
+    },
+    fetchData() {
+      this.axios
+        .get(this.$apiBaseUrl + "CogItem", {
+          headers: { Authorization: `Bearer ${this.$store.state.token}` },
+        })
+        .then((response) => {
+          this.$store.commit("cogitemstore/fetchData", response.data);
         })
         .catch((error) => {
           if (error.response) {
@@ -196,10 +238,10 @@ export default {
     },
     edit(e) {
       let id = e.currentTarget.id.replace("edit", "");
-      let re = this.$store.state.cog1store.mainTable.find(
+      let re = this.$store.state.cogitemstore.mainTable.find(
         (item) => item.id == id
       );
-      this.$store.commit("cog1store/serData", re);
+      this.$store.commit("cogitemstore/serData", re);
       $("#addnew").modal();
     },
     del(e) {
@@ -207,7 +249,7 @@ export default {
       this.$showConfirmationDialog("您確定是否刪除").then((result) => {
         if (result.isConfirmed) {
           this.axios
-            .delete(this.$apiBaseUrl + "Cog1/" + id, {
+            .delete(this.$apiBaseUrl + "CogItem/" + id, {
               headers: { Authorization: `Bearer ${this.$store.state.token}` },
             })
             .then(() => {
@@ -216,49 +258,57 @@ export default {
               });
             })
             .catch((error) => {
-              if (error.response) {
-                if (error.response.status === 401) {
-                  this.$showAlertThen("請重新登入", "info", () => {
-                    this.$store.commit("UserChkNone");
-                    this.$router.push({ name: "login" });
-                  });
-                } else {
-                  this.$showAlertThen(error.response.data, "info", () => {});
-                  // 處理錯誤
-                }
+              if (error.response.status === 401) {
+                this.$showAlertThen("請重新登入", "info", () => {
+                  this.$store.commit("UserChkNone");
+                  this.$router.push({ name: "login" });
+                });
+              } else {
+                console.log(error);
+                // 處理錯誤
               }
             });
         }
       });
     },
     add() {
-      this.$store.commit("cog1store/addData", -1);
+      this.$store.commit("cogitemstore/addData", -1);
       this.$nextTick(() => {
-        this.$store.commit("cog1store/addData", 0);
+        this.$store.commit("cogitemstore/addData", 0);
       });
     },
     clearsearch() {
       this.page = 1;
       this.search_no = "";
       this.search_name = "";
+      this.search_type = "";
       this.no = "";
       this.name = "";
+      this.type = "";
     },
     search() {
       this.page = 1;
       this.search_no = this.no;
       this.search_name = this.name;
+      this.search_type = this.type;
     },
   },
   computed: {
     filterTable() {
-      let arr = this.$store.state.cog1store.mainTable;
+      let arr = this.$store.state.cogitemstore.mainTable;
       if (this.search_name !== "") {
         arr = arr.filter((item) => item.name.indexOf(this.search_name) >= 0);
       }
       if (this.search_no !== "") {
         arr = arr.filter((item) => item.no.indexOf(this.search_no) >= 0);
       }
+      if (this.search_type !== "") {
+        arr = arr.filter((item) => item.mid == this.search_type);
+      }
+      return arr;
+    },
+    MainDrop() {
+      let arr = this.$store.state.cogitemstore.ddl;
       return arr;
     },
     PageViewer() {
@@ -272,7 +322,7 @@ export default {
       return this.filterTable.length;
     },
     changedata() {
-      return this.$store.state.cog1store.change;
+      return this.$store.state.cogitemstore.change;
     },
     pageCount() {
       return Math.ceil(this.rows / this.$store.state.pagecount);

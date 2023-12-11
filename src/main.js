@@ -12,6 +12,9 @@ import { API_BASE_URL } from "./config.js";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import Paginate from "vuejs-paginate-next";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
 const app = createApp(App);
 
 app.config.globalProperties.$showConfirmationDialog = function (message) {
@@ -26,6 +29,7 @@ app.config.globalProperties.$showConfirmationDialog = function (message) {
   });
 };
 app.component("PaginateMo", Paginate);
+app.component("v-select", vSelect);
 app.config.globalProperties.$showAlertThen = function (
   message,
   icon,
@@ -33,7 +37,7 @@ app.config.globalProperties.$showAlertThen = function (
 ) {
   this.$swal
     .fire({
-      text: message,
+      html: message,
       icon: icon,
       confirmButtonText: "確定",
       confirmButtonColor: "#3085d6",

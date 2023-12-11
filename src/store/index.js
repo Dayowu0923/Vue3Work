@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 import cog1store from "./modules/cog1store.js";
-
+import cogitemstore from "./modules/cogitemstore.js";
 export default createStore({
   state: {
     pagecount: 10,
@@ -60,5 +60,6 @@ export default createStore({
   },
   modules: {
     cog1store,
+    cogitemstore,
   },
 });
