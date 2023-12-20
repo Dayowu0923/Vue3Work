@@ -74,7 +74,7 @@ export default {
     };
   },
   computed: {
-    ser_data() {
+    serData() {
       return this.$store.state.cogitemstore.edit_id;
     },
     MainDrop() {
@@ -83,7 +83,7 @@ export default {
     },
   },
   watch: {
-    ser_data(old_value) {
+    serData(old_value) {
       if (old_value === 0) {
         this.txt_no = "";
         this.txt_name = "";

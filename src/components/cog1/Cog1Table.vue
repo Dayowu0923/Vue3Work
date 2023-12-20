@@ -164,7 +164,7 @@ export default {
     this.fetchData();
   },
   watch: {
-    changedata(value) {
+    changeData(value) {
       if (value === 1) {
         this.fetchData();
         this.$store.commit("cog1store/changeData", 0);
@@ -271,7 +271,7 @@ export default {
     rows() {
       return this.filterTable.length;
     },
-    changedata() {
+    changeData() {
       return this.$store.state.cog1store.change;
     },
     pageCount() {

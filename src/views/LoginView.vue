@@ -51,7 +51,7 @@
                 :src="captchaUrl"
                 alt="驗證碼"
                 width="100"
-                @click="refreshCaptcha"
+                @click="RefreshCaptcha"
               />
             </div>
           </div>
@@ -59,7 +59,7 @@
             <a href="#" class="btn btn-dark"
               ><i class="fas fa-question-circle"></i> 忘記密碼</a
             >
-            <a @click="login" class="btn btn-primary ml-6">登入</a>
+            <a @click="Login" class="btn btn-primary ml-6">登入</a>
             <p>請輸入帳號密碼，有任何問題請聯絡資訊人員</p>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default {
   data() {
     return {
       // 驗證碼URL
-      captchaUrl: `${this.$apiBaseUrl}CaptchaService`,
+      captchaUrl: `${this.$apiBaseUrl}Captcha`,
       captchatxt: "",
       password: "",
       account: "",
@@ -185,11 +185,11 @@ export default {
   },
   methods: {
     // 刷新驗證碼
-    refreshCaptcha() {
+    RefreshCaptcha() {
       // 通過改變URL的query參數來刷新驗證碼
-      this.captchaUrl = `${this.$apiBaseUrl}CaptchaService?_t=${Date.now()}`;
+      this.captchaUrl = `${this.$apiBaseUrl}Captcha?_t=${Date.now()}`;
     },
-    login() {
+    Login() {
       const data = {
         Captcha: this.captchatxt,
         Username: this.account,
@@ -199,16 +199,9 @@ export default {
         .post(this.$apiBaseUrl + "Login", data)
         .then((response) => {
           this.$store.commit("UserChk", response.data);
-          this.$swal
-            .fire({
-              text: "登入成功",
-              icon: "success",
-              confirmButtonText: "確定",
-              confirmButtonColor: "#3085d6",
-            })
-            .then(() => {
-              this.$router.push({ name: "cog1" });
-            });
+          this.$showAlertThen("登入成功", "success", () => {
+            this.$router.push({ name: "cog1" });
+          });
         })
         .catch((error) => {
           this.$store.commit("UserChkNone");

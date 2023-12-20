@@ -47,7 +47,7 @@
               <button
                 type="button"
                 class="btn btn-outline-dark"
-                @click="clearsearch"
+                @click="clearSearch"
               >
                 <i class="fas fa-times"></i>清除重填
               </button>
@@ -184,7 +184,7 @@ export default {
     this.fetchDdl();
   },
   watch: {
-    changedata(value) {
+    changeData(value) {
       if (value === 1) {
         this.fetchData();
         this.$store.commit("cogitemstore/changeData", 0);
@@ -277,7 +277,7 @@ export default {
         this.$store.commit("cogitemstore/addData", 0);
       });
     },
-    clearsearch() {
+    clearSearch() {
       this.page = 1;
       this.search_no = "";
       this.search_name = "";
@@ -321,7 +321,7 @@ export default {
     rows() {
       return this.filterTable.length;
     },
-    changedata() {
+    changeData() {
       return this.$store.state.cogitemstore.change;
     },
     pageCount() {
